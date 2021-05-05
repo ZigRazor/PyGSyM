@@ -8,7 +8,6 @@ from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QVBoxLayout, QWidget)
 from qtpy.QtCore import Slot
 
-import main_window2
 import main_window
 
 import os
@@ -20,6 +19,8 @@ import psutil
 if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
+
+    app.processEvents()
 
     form = main_window.Main_Window()
     form.show()
