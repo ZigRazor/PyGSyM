@@ -44,7 +44,9 @@ class Main_Window(QDialog):
         #mainLayout.setColumnStretch(1, 1)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle("Styles")
+        self.setWindowTitle("PyGSyM")
+        self.setAcceptDrops(True)
+        self.setMinimumSize(400, 500)
         self.changeStyle('Fusion')
 
 
