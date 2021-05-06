@@ -3,11 +3,10 @@ from asyncio import wait
 
 from PyQt5.QtWidgets import QLineEdit
 from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
-                            QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-                            QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
+                            QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
                             QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
                             QVBoxLayout, QWidget, QFrame)
-from qtpy.QtCore import QDateTime, Qt, QTimer, Slot, QThread, QObject, Signal, QRunnable, Signal
+from qtpy.QtCore import QDateTime, Qt, QTimer, Slot, QThread, QObject, QRunnable, Signal
 import psutil
 
 import re
