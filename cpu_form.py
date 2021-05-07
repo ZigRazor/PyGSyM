@@ -11,6 +11,8 @@ import psutil
 
 import re
 
+import CpuProgressBar
+
 
 def set_progress_bar_value(progress_bar: QProgressBar, value: float):
     progress_bar.setValue(value)
@@ -26,7 +28,7 @@ class Cpu_Form(QDialog):
         self.frequencyLabel = QLabel()
         self.progressBarXcpu = []
         self.b_detail = QPushButton("ShowDetail")
-        self.progressBar = QProgressBar()
+        self.progressBar = CpuProgressBar.TotalCPUProgressBar()
 
         # Create Frame
         self.progressBar_x_cpu_frame = QFrame()
@@ -108,7 +110,7 @@ class Cpu_Form(QDialog):
     def create_progress_bar_x_cpu(self):
         cpu_count = psutil.cpu_count()
         for i in range(cpu_count):
-            self.progressBarXcpu.append(QProgressBar())
+            self.progressBarXcpu.append(CpuProgressBar.XCPUProgressBar(None, i))
             self.progressBarXcpu[i].setRange(0, 100)
             self.progressBarXcpu[i].setValue(0)
             label = QLabel()
