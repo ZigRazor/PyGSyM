@@ -1,17 +1,15 @@
-import traceback
-from asyncio import wait
-
-from PyQt5.QtWidgets import QLineEdit
 from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
                             QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
                             QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-                            QVBoxLayout, QWidget, QFrame)
+                            QVBoxLayout, QWidget, QFrame, QLineEdit)
 from qtpy.QtCore import QDateTime, Qt, QTimer, Slot, QThread, QObject, QRunnable, Signal
 import psutil
 
 import re
 
 import CpuProgressBar
+import CpuDataGrabber
+import CpuFrame
 
 
 def set_progress_bar_value(progress_bar: QProgressBar, value: float):
@@ -27,20 +25,22 @@ class Cpu_Form(QDialog):
         self.applyFrequency = QPushButton()
         self.frequencyLabel = QLabel()
         self.progressBarXcpu = []
-        self.b_detail = QPushButton("ShowDetail")
-        self.progressBar = CpuProgressBar.TotalCPUProgressBar()
+        #self.b_detail = QPushButton("ShowDetail")
+        #self.progressBar = CpuProgressBar.TotalCPUProgressBar()
+        #self.label_total_cpu = QLabel()
 
         # Create Frame
+        self.progressBar_total_frame = CpuFrame.CpuTotalFrame()
         self.progressBar_x_cpu_frame = QFrame()
 
         # Create Layout
         self.frequencyLayout = QHBoxLayout()
         self.progressBar_x_cpu_Layout = QVBoxLayout()
-        self.total_progressBarLayout = QHBoxLayout()
+        #self.total_progressBarLayout = QHBoxLayout()
         self.layout = QVBoxLayout()
 
         # Other Classes
-        self.data_grabber = CpuDataGrabber()
+        self.data_grabber = CpuDataGrabber.CpuDataGrabber()
         self.thread = QThread()
 
         # self.setFrequency(100000.0)
@@ -52,6 +52,8 @@ class Cpu_Form(QDialog):
 
         self.setLayout(self.layout)
         self.core_update_cpu_stat()
+
+        self.progressBar_total_frame.show_detail.connect(self.show_detail_clicked)
 
     def set_frequency(self, new_frequency: float):
         self.data_grabber.frequency = new_frequency
@@ -74,38 +76,16 @@ class Cpu_Form(QDialog):
             value_total += value_x_cpu[i]
             set_progress_bar_value(self.progressBarXcpu[i], value_x_cpu[i])
         value_total /= cpu_count
-        set_progress_bar_value(self.progressBar, value_total)
+        self.progressBar_total_frame.update_cpu_stat(results)
 
-    def total_cpu_progress_bar_update(self):
-        set_progress_bar_value(self.progressBar, self.calculateCPUUsageTotal(self.frequency / 1000))
-
-    def cpu_progress_bar_update_xcpu(self):
-        x_cpu_usage = self.calculateCPUUsageXCPU(self.frequency / 1000)
-        cpu_count = psutil.cpu_count()
-        for i in range(cpu_count):
-            set_progress_bar_value(self.progressBarXcpu[i], x_cpu_usage[i])
-
-    def show_detail_clicked(self):
-        if self.b_detail.isChecked():
+    def show_detail_clicked(self, show: bool):
+        if show:
             self.progressBar_x_cpu_frame.show()
-            self.b_detail.setText("Hide Details")
         else:
             self.progressBar_x_cpu_frame.hide()
-            self.b_detail.setText("Show Details")
 
     def create_progress_bar_total(self):
-        self.progressBar.setRange(0, 100)
-        self.progressBar.setValue(0)
-
-        label = QLabel()
-        label.setText("Total")
-
-        self.b_detail.setCheckable(True)
-        self.b_detail.clicked.connect(self.show_detail_clicked)
-        self.total_progressBarLayout.addWidget(label)
-        self.total_progressBarLayout.addWidget(self.progressBar)
-        self.total_progressBarLayout.addWidget(self.b_detail)
-        self.layout.addLayout(self.total_progressBarLayout)
+        self.layout.addWidget(self.progressBar_total_frame)
 
     def create_progress_bar_x_cpu(self):
         cpu_count = psutil.cpu_count()
@@ -123,10 +103,6 @@ class Cpu_Form(QDialog):
         self.progressBar_x_cpu_frame.hide()
         # layout.addLayout(self.progressBar_x_cpu_Layout)
         self.layout.addWidget(self.progressBar_x_cpu_frame)
-
-        # timer = QTimer(self)
-        # timer.timeout.connect(self.CPUProgressBarUpdateXCPU)
-        # timer.start(1000)
 
     def update_frequency(self):
         value_string = re.search(r'\d+\.\d+|\d+', self.editFrequencyText.text())
@@ -146,38 +122,3 @@ class Cpu_Form(QDialog):
         self.frequencyLayout.addWidget(self.editFrequencyText)
         self.frequencyLayout.addWidget(self.applyFrequency)
         self.layout.addLayout(self.frequencyLayout)
-
-
-class CpuDataGrabber(QObject):
-    finished = Signal()
-
-    results = Signal(dict)  # set the type of object you are sending
-
-    def __init__(self):
-        super().__init__()
-        self.cpu_count = psutil.cpu_count()
-        self.value_x_cpu = 0
-        self.value_total = 0.0
-        self.frequency = 1000
-        self.count = 0
-
-    @staticmethod
-    def calculate_usage_x_cpu(cpu_interval):
-        return psutil.cpu_percent(interval=cpu_interval, percpu=True)
-
-    def run(self):
-        while True:
-            try:
-                self.value_x_cpu = self.calculate_usage_x_cpu(self.frequency / 1000)
-                for i in range(self.cpu_count):
-                    self.value_total += self.value_x_cpu[i]
-                self.value_total /= self.cpu_count
-                self.send_results()  # when done, send the results
-            except:
-                traceback.print_exc()
-
-        self.finished.emit()
-
-    def send_results(self):
-        results = {'value_total': self.value_total, 'value_x_cpu': self.value_x_cpu, 'cpu_count': self.cpu_count}
-        self.results.emit(results)
