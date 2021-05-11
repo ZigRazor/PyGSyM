@@ -40,8 +40,10 @@ class Cpu_Form(QDialog):
         self.layout = QVBoxLayout()
 
         # Other Classes
-        self.data_grabber = CpuDataGrabber.CpuDataGrabber()
-        self.thread = QThread()
+        self.cpu_percent_grabber = CpuDataGrabber.CpuPercentGrabber()
+        self.thread_percent = QThread()
+        self.cpu_times_grabber = CpuDataGrabber.CpuTimesGrabber()
+        self.thread_times = QThread()
 
         # self.setFrequency(100000.0)
         # self.timer = QTimer(self)
@@ -56,18 +58,29 @@ class Cpu_Form(QDialog):
         self.progressBar_total_frame.show_detail.connect(self.show_detail_clicked)
 
     def set_frequency(self, new_frequency: float):
-        self.data_grabber.frequency = new_frequency
+        self.cpu_percent_grabber.frequency = new_frequency
 
     def core_update_cpu_stat(self):
-        self.data_grabber.moveToThread(self.thread)
-        self.data_grabber.results.connect(self.update_cpu_stat)
-        self.data_grabber.finished.connect(self.thread.quit)
-        self.data_grabber.finished.connect(self.data_grabber.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.started.connect(self.data_grabber.run)
-        self.thread.start()
+        # Percent
+        self.cpu_percent_grabber.moveToThread(self.thread_percent)
+        self.cpu_percent_grabber.results.connect(self.update_cpu_percent_stat)
+        self.cpu_percent_grabber.finished.connect(self.thread_percent.quit)
+        self.cpu_percent_grabber.finished.connect(self.cpu_percent_grabber.deleteLater)
+        self.thread_percent.finished.connect(self.thread_percent.deleteLater)
+        self.thread_percent.started.connect(self.cpu_percent_grabber.run)
+        self.thread_percent.start()
 
-    def update_cpu_stat(self, results):
+        # Times
+        self.cpu_times_grabber.moveToThread(self.thread_times)
+        self.cpu_times_grabber.results.connect(self.update_cpu_times_stat)
+        self.cpu_times_grabber.finished.connect(self.thread_times.quit)
+        self.cpu_times_grabber.finished.connect(self.cpu_times_grabber.deleteLater)
+        self.thread_times.finished.connect(self.thread_times.deleteLater)
+        self.thread_times.started.connect(self.cpu_times_grabber.run)
+        self.thread_times.start()
+
+
+    def update_cpu_percent_stat(self, results):
         value_total = results['value_total']
         value_x_cpu = results['value_x_cpu']
         cpu_count = results['cpu_count']
@@ -76,7 +89,14 @@ class Cpu_Form(QDialog):
             value_total += value_x_cpu[i]
             set_progress_bar_value(self.progressBarXcpu[i], value_x_cpu[i])
         value_total /= cpu_count
-        self.progressBar_total_frame.update_cpu_stat(results)
+        self.progressBar_total_frame.update_cpu_percent_stat(results)
+
+    def update_cpu_times_stat(self, results):
+        value_total = results['value_total']
+        value_x_cpu = results['value_x_cpu']
+        cpu_count = results['cpu_count']
+
+        self.progressBar_total_frame.update_cpu_times_stat(results)
 
     def show_detail_clicked(self, show: bool):
         if show:
