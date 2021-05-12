@@ -48,11 +48,19 @@ class CpuTotalFrame(QFrame):
 
     def switch_progress_bar_total(self):
 
-        if self.pb_total_cpu.isHidden():            
-            self.lay_total_cpu.removeWidget(self.pb_total_cpu)
-            self.lay_total_cpu.removeWidget(self.b_detail)
-            self.pb_total_cpu.hide()
-            self.b_detail.hide()
+        if self.pb_total_cpu.isHidden():
+            for i in reversed(range(self.lay_total_cpu.count())):
+                self.lay_total_cpu.itemAt(i).widget().hide()
+                self.lay_total_cpu.itemAt(i).widget().setParent(None)
+            self.lay_total_cpu.addWidget(self.pb_total_cpu)
+            self.lay_total_cpu.addWidget(self.b_detail)
+            for i in reversed(range(self.lay_total_cpu.count())):
+                self.lay_total_cpu.itemAt(i).widget().show()
+
+        else:
+            for i in reversed(range(self.lay_total_cpu.count())):
+                self.lay_total_cpu.itemAt(i).widget().hide()
+                self.lay_total_cpu.itemAt(i).widget().setParent(None)
 
             self.lay_total_cpu.addWidget(self.label_cpu_time_user)
             self.lay_total_cpu.addWidget(self.label_value_cpu_time_user)
@@ -65,37 +73,10 @@ class CpuTotalFrame(QFrame):
             self.lay_total_cpu.addWidget(self.label_cpu_time_dpc)
             self.lay_total_cpu.addWidget(self.label_value_cpu_time_dpc)
             self.lay_total_cpu.addWidget(self.b_detail)
-            for i in reversed(range(self.lay_total_cpu.count())):                 
-                self.lay_total_cpu.itemAt(i).widget().show()  
-            #self.label_test.hide()
-            #self.button_test.hide()
-            #self.pb_total_cpu.show()
-            #self.b_detail.show()
-        else: 
-            for i in reversed(range(self.lay_total_cpu.count())):                 
-                self.lay_total_cpu.itemAt(i).widget().hide()           
-            self.lay_total_cpu.removeWidget(self.label_cpu_time_user)
-            self.lay_total_cpu.removeWidget(self.label_value_cpu_time_user)
-            self.lay_total_cpu.removeWidget(self.label_cpu_time_system)
-            self.lay_total_cpu.removeWidget(self.label_value_cpu_time_system)
-            self.lay_total_cpu.removeWidget(self.label_cpu_time_idle)
-            self.lay_total_cpu.removeWidget(self.label_value_cpu_time_idle)
-            self.lay_total_cpu.removeWidget(self.label_cpu_time_interrupt)
-            self.lay_total_cpu.removeWidget(self.label_value_cpu_time_interrupt)
-            self.lay_total_cpu.removeWidget(self.label_cpu_time_dpc)
-            self.lay_total_cpu.removeWidget(self.label_value_cpu_time_dpc)
-            self.lay_total_cpu.removeWidget(self.b_detail)
-            self.lay_total_cpu.addWidget(self.pb_total_cpu)
-            self.lay_total_cpu.addWidget(self.b_detail)
-            for i in reversed(range(self.lay_total_cpu.count())):                 
-                self.lay_total_cpu.itemAt(i).widget().show()  
-            #self.label_test.show()
-            #self.button_test.show()
-            #self.pb_total_cpu.hide()
-            #self.b_detail.hide()
+            for i in reversed(range(self.lay_total_cpu.count())):
+                self.lay_total_cpu.itemAt(i).widget().show()
 
     def mouseReleaseEvent(self, a0: QMouseEvent) -> None:
-        print("mouse release event")
         self.switch_progress_bar_total()
 
     def show_detail_clicked(self):
@@ -112,8 +93,8 @@ class CpuTotalFrame(QFrame):
 
     def update_cpu_times_stat(self, stats):
         value_total = stats['value_total']
-        self.label_value_cpu_time_user = QLabel(str(value_total["user"]))
-        self.label_value_cpu_time_system = QLabel(str(value_total["system"]))
-        self.label_value_cpu_time_idle = QLabel(str(value_total["idle"]))
-        self.label_value_cpu_time_interrupt = QLabel(str(value_total["interrupt"]))
-        self.label_value_cpu_time_dpc = QLabel(str(value_total["dpc"]))
+        self.label_value_cpu_time_user.setText("{:3.2f}".format(value_total["user"]))
+        self.label_value_cpu_time_system.setText("{:3.2f}".format(value_total["system"]))
+        self.label_value_cpu_time_idle.setText("{:3.2f}".format(value_total["idle"]))
+        self.label_value_cpu_time_interrupt.setText("{:3.2f}".format(value_total["interrupt"]))
+        self.label_value_cpu_time_dpc.setText("{:3.2f}".format(value_total["dpc"]))

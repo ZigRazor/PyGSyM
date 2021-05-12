@@ -1,5 +1,6 @@
 from qtpy.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
-                            QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
+                            QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QProgressBar, QPushButton,
+                            QRadioButton, QScrollBar, QSizePolicy,
                             QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
                             QVBoxLayout, QWidget, QFrame, QLineEdit)
 from qtpy.QtCore import QDateTime, Qt, QTimer, Slot, QThread, QObject, QRunnable, Signal
@@ -16,18 +17,18 @@ def set_progress_bar_value(progress_bar: QProgressBar, value: float):
     progress_bar.setValue(value)
 
 
-class Cpu_Form(QDialog):
+class CpuForm(QDialog):
 
     def __init__(self, parent=None):
-        super(Cpu_Form, self).__init__(parent)
+        super(CpuForm, self).__init__(parent)
         # Create widgets
         self.editFrequencyText = QLineEdit("1000")
         self.applyFrequency = QPushButton()
         self.frequencyLabel = QLabel()
         self.progressBarXcpu = []
-        #self.b_detail = QPushButton("ShowDetail")
-        #self.progressBar = CpuProgressBar.TotalCPUProgressBar()
-        #self.label_total_cpu = QLabel()
+        # self.b_detail = QPushButton("ShowDetail")
+        # self.progressBar = CpuProgressBar.TotalCPUProgressBar()
+        # self.label_total_cpu = QLabel()
 
         # Create Frame
         self.progressBar_total_frame = CpuFrame.CpuTotalFrame()
@@ -36,7 +37,7 @@ class Cpu_Form(QDialog):
         # Create Layout
         self.frequencyLayout = QHBoxLayout()
         self.progressBar_x_cpu_Layout = QVBoxLayout()
-        #self.total_progressBarLayout = QHBoxLayout()
+        # self.total_progressBarLayout = QHBoxLayout()
         self.layout = QVBoxLayout()
 
         # Other Classes
@@ -59,6 +60,7 @@ class Cpu_Form(QDialog):
 
     def set_frequency(self, new_frequency: float):
         self.cpu_percent_grabber.frequency = new_frequency
+        self.cpu_times_grabber.frequency = new_frequency
 
     def core_update_cpu_stat(self):
         # Percent
@@ -79,7 +81,6 @@ class Cpu_Form(QDialog):
         self.thread_times.started.connect(self.cpu_times_grabber.run)
         self.thread_times.start()
 
-
     def update_cpu_percent_stat(self, results):
         value_total = results['value_total']
         value_x_cpu = results['value_x_cpu']
@@ -95,7 +96,6 @@ class Cpu_Form(QDialog):
         value_total = results['value_total']
         value_x_cpu = results['value_x_cpu']
         cpu_count = results['cpu_count']
-
         self.progressBar_total_frame.update_cpu_times_stat(results)
 
     def show_detail_clicked(self, show: bool):
