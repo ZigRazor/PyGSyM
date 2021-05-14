@@ -26,18 +26,14 @@ class CpuForm(QDialog):
         self.applyFrequency = QPushButton()
         self.frequencyLabel = QLabel()
         self.progressBarXcpu = []
-        # self.b_detail = QPushButton("ShowDetail")
-        # self.progressBar = CpuProgressBar.TotalCPUProgressBar()
-        # self.label_total_cpu = QLabel()
 
         # Create Frame
-        self.progressBar_total_frame = CpuFrame.CpuTotalFrame()
-        self.progressBar_x_cpu_frame = QFrame()
+        self.cpu_total_frame = CpuFrame.CpuTotalFrame()
+        self.cpu_x_cpu_frame = CpuFrame.CpuDetailedFrame()
 
         # Create Layout
         self.frequencyLayout = QHBoxLayout()
         self.progressBar_x_cpu_Layout = QVBoxLayout()
-        # self.total_progressBarLayout = QHBoxLayout()
         self.layout = QVBoxLayout()
 
         # Other Classes
@@ -46,9 +42,6 @@ class CpuForm(QDialog):
         self.cpu_times_grabber = CpuDataGrabber.CpuTimesGrabber()
         self.thread_times = QThread()
 
-        # self.setFrequency(100000.0)
-        # self.timer = QTimer(self)
-
         self.create_frequency_handler()
         self.create_progress_bar_total()
         self.create_progress_bar_x_cpu()
@@ -56,7 +49,7 @@ class CpuForm(QDialog):
         self.setLayout(self.layout)
         self.core_update_cpu_stat()
 
-        self.progressBar_total_frame.show_detail.connect(self.show_detail_clicked)
+        self.cpu_total_frame.show_detail.connect(self.show_detail_clicked)
 
     def set_frequency(self, new_frequency: float):
         self.cpu_percent_grabber.frequency = new_frequency
@@ -84,52 +77,34 @@ class CpuForm(QDialog):
     def update_cpu_percent_stat(self, results):
         value_total = results['value_total']
         value_x_cpu = results['value_x_cpu']
-        cpu_count = results['cpu_count']
-
-        for i in range(cpu_count):
-            value_total += value_x_cpu[i]
-            set_progress_bar_value(self.progressBarXcpu[i], value_x_cpu[i])
-        value_total /= cpu_count
-        self.progressBar_total_frame.update_cpu_percent_stat(results)
+        cpu_count = results['cpu_count']        
+        self.cpu_total_frame.update_cpu_percent_stat(results)
+        self.cpu_x_cpu_frame.update_cpu_percent_stat(results)
 
     def update_cpu_times_stat(self, results):
         value_total = results['value_total']
         value_x_cpu = results['value_x_cpu']
         cpu_count = results['cpu_count']
-        self.progressBar_total_frame.update_cpu_times_stat(results)
+        self.cpu_total_frame.update_cpu_times_stat(results)
+        self.cpu_x_cpu_frame.update_cpu_times_stat(results)
 
     def show_detail_clicked(self, show: bool):
         if show:
-            self.progressBar_x_cpu_frame.show()
+            self.cpu_x_cpu_frame.show()
         else:
-            self.progressBar_x_cpu_frame.hide()
+            self.cpu_x_cpu_frame.hide()
 
     def create_progress_bar_total(self):
-        self.layout.addWidget(self.progressBar_total_frame)
+        self.layout.addWidget(self.cpu_total_frame)
 
     def create_progress_bar_x_cpu(self):
-        cpu_count = psutil.cpu_count()
-        for i in range(cpu_count):
-            self.progressBarXcpu.append(CpuProgressBar.XCPUProgressBar(None, i))
-            self.progressBarXcpu[i].setRange(0, 100)
-            self.progressBarXcpu[i].setValue(0)
-            label = QLabel()
-            label.setText("CPU " + str(i))
-            internalLayout = QHBoxLayout()
-            internalLayout.addWidget(label)
-            internalLayout.addWidget(self.progressBarXcpu[i])
-            self.progressBar_x_cpu_Layout.addLayout(internalLayout)
-        self.progressBar_x_cpu_frame.setLayout(self.progressBar_x_cpu_Layout)
-        self.progressBar_x_cpu_frame.hide()
-        # layout.addLayout(self.progressBar_x_cpu_Layout)
-        self.layout.addWidget(self.progressBar_x_cpu_frame)
+        self.layout.addWidget(self.cpu_x_cpu_frame)
 
     def update_frequency(self):
         value_string = re.search(r'\d+\.\d+|\d+', self.editFrequencyText.text())
         if value_string is not None:
             new_frequency = float(value_string.group())
             self.set_frequency(new_frequency)
-            # self.setInterval(self.timer, new_frequency)
 
     def create_frequency_handler(self):
         self.frequencyLabel.setText("Set Frequency")

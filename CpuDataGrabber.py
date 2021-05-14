@@ -93,5 +93,13 @@ class CpuTimesGrabber(QObject):
         self.finished.emit()
 
     def send_results(self):
-        results = {'value_total': self.value_total, 'value_x_cpu': self.value_x_cpu, 'cpu_count': self.cpu_count}
+        value_x_cpu_local = []
+        for i in range(self.cpu_count):
+            value_x_cpu_local.append({})
+            value_x_cpu_local[i]["user"] = self.value_x_cpu[i].user
+            value_x_cpu_local[i]["system"] = self.value_x_cpu[i].system
+            value_x_cpu_local[i]["idle"] = self.value_x_cpu[i].idle
+            value_x_cpu_local[i]["interrupt"] = self.value_x_cpu[i].interrupt
+            value_x_cpu_local[i]["dpc"] = self.value_x_cpu[i].dpc
+        results = {'value_total': self.value_total, 'value_x_cpu': value_x_cpu_local, 'cpu_count': self.cpu_count}
         self.results.emit(results)
