@@ -75,16 +75,10 @@ class CpuForm(QDialog):
         self.thread_times.start()
 
     def update_cpu_percent_stat(self, results):
-        value_total = results['value_total']
-        value_x_cpu = results['value_x_cpu']
-        cpu_count = results['cpu_count']        
         self.cpu_total_frame.update_cpu_percent_stat(results)
         self.cpu_x_cpu_frame.update_cpu_percent_stat(results)
 
     def update_cpu_times_stat(self, results):
-        value_total = results['value_total']
-        value_x_cpu = results['value_x_cpu']
-        cpu_count = results['cpu_count']
         self.cpu_total_frame.update_cpu_times_stat(results)
         self.cpu_x_cpu_frame.update_cpu_times_stat(results)
 
