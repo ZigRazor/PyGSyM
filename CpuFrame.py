@@ -37,7 +37,6 @@ class CpuBaseFrame(QFrame):
         self.lay_cpu.addWidget(self.l_cpu)
         self.lay_cpu.addWidget(self.pb_cpu)
         self.setLayout(self.lay_cpu)
-        # self.layout.addWidget(self.progressBar_total_frame)
 
     def setLabelText(self, text: str):        
         self.l_cpu.setText(text)
@@ -104,8 +103,8 @@ class CpuTotalFrame(QFrame):
         self.f_total_cpu.setLabelText("Total")
         self.b_detail.setCheckable(True)
         self.b_detail.clicked.connect(self.show_detail_clicked)
-        self.lay_total_cpu.addWidget(self.f_total_cpu)
-        self.lay_total_cpu.addWidget(self.b_detail)
+        self.lay_total_cpu.addWidget(self.f_total_cpu, stretch= 5)
+        self.lay_total_cpu.addWidget(self.b_detail, stretch= 1)
         self.setLayout(self.lay_total_cpu)
 
     def show_detail_clicked(self):
@@ -137,8 +136,6 @@ class CpuDetailedFrame(QFrame):
 
         # layout
         self.lay_detailed_cpu = QVBoxLayout()
-        self.sub_f_detailed_cpu = [] 
-        self.sub_lay_detailed_cpu = [] 
 
         # initialize
         self.cpu_count = psutil.cpu_count()
